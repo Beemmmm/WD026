@@ -1,6 +1,8 @@
 <?php
     require_once 'config.php';
 
+    $error = []; //Arror to hold
+
     if($_SERVER['REQUEST_METHOD'] === 'POST'){
         // รับค่าจากฟอร์ม
         $username = trim($_POST['username']);
@@ -9,16 +11,44 @@
         $password = ($_POST['password']);
         $confirm_password = ($_POST['confirm_password']);
 
-    // นำข้อมูลไปบันทึกในฐานข้อมูล
+    // ตรวจสอบว่ากรอกข้อมูลครบหรือไม่ (empty)
+    if(empty($username)||empty($fullname)||empty($email)||empty($password)||empty($confirm_password)){
+        $error[] = "กรุณากรอกข้อมูลให้ครบทุกช่อง";
+    
 
+    // ตรวจสอบงาสอีเมลถูกต้องหรือไม่ (filter_var)
+    } elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+    // ตรวจสอบรูปแบบอีเมล
+        $reeor[] = "กรุณากรอกอีเมลให้ถูกต้อง";
+    } elseif($password !==$confirm_password){
+    // ตรวจสอบรหัสผ่านและยืนยันรหัสผ่านว่าตรงกันหรือไม่
+        $error[] = "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน";
+    } else {
+        // ตรวจสอบว่ามีชื่อผู้ใช้หรืออีเมลถูกใช้ไปแล้วหรือไม่
+        $sql = "SELECT * FROM users WHERE username = ? OR email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$username, $email]);
+        
+        if($stmt->rowCount() > 0){
+        $error[] = "ชื่อผู้ใช้หรืออีเมลนี้ถูกใช้ไปแล้ว";
+        }
+    }
+
+    if (empty($error)){
+         // นำข้อมูลไปบันทึกในฐานข้อมูล
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO users(username,full_name,email,password,role) VALUES (?, ?, ?, ?, 'admin')";
+    $sql = "INSERT INTO users(username,full_name,email,password,role) VALUES (?, ?, ?, ?, 'member')";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$username,$fullname,$email,$hashedPassword]);
-    }
-?>
 
+    // ถ้าบันทึกสำเร็จ ใฟ้เปลี่ยนเส้นทางไปหน้า iogin
+    header("Location: login.php?register=success");
+    exit(); // หยุดการทำงานของสคริปต์หลังจากเปลี่ยนเส้นทาง
+
+    }
+        }
+?>
 
 <!DOCTYPE html>
 <html lang="th">
@@ -43,33 +73,48 @@
     </style>
 </head>
 <body>
+
     <div class="container register-container">
         <h2 class="text-center mb-4"> สมัครสมาชิก</h2>
         <hr>
+    <?php if (!empty($error)): // ถ้ามีข้อผิดพลำด ให้แสดงข ้อควำม ?>
+        <div class="alert alert-danger">
+        <ul>
+        <?php foreach ($error as $e): ?>
+        <li><?= htmlspecialchars($e) ?></li>
+        <!-- ใช ้ htmlspecialchars เพื่อป้องกัน XSS -->
+        <!-- < ? = คือ short echo tag ?> -->
+        <!-- ถ้าเขียนเต็ม จะได้แบบด้านล่ำง -->
+        <?php // echo "<li>" . htmlspecialchars($e) . "</li>"; ?>
+        <?php endforeach; ?>
+        </ul>
+        </div>
+    <?php endif; ?>
+
         <form action="register.php" method="post">
             <div class="mb-3">
                 <label for="username" class="form-label"> ชื่อผู้ใช้ </label>
-                <input type="text" name="username" id="username" class="form-control" placeholder="ชื่อผู้ใช้" required>
+                <input type="text" name="username" id="username" class="form-control" placeholder="ชื่อผู้ใช้" value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>" required>
             </div>
             
             <div class="mb-3">
                 <label for="fullname" class="form-label"> ชื่อ - นามสกุล </label>
-                <input type="text" name="fullname" id="fullname" class="form-control" placeholder="ชื่อ - นามสกุล" required>
+                <input type="text" name="fullname" id="fullname" class="form-control" placeholder="ชื่อ - นามสกุล"value="<?= isset($_POST['fullname']) ? htmlspecialchars($_POST['fullname']) : '' ?>"required>
             </div>
 
             <div class="mb-3">
                 <label for="email" class="form-label"> อีเมล </label>
-                <input type="text" name="email" id="email" class="form-control" placeholder="อีเมล" required>
+                <input type="text" name="email" id="email" class="form-control" placeholder="อีเมล" value="<?= isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '' ?>"required>
             </div>
 
             <div class="mb-3">
                 <label for="password" class="form-label"> รหัสผ่าน </label>
-                <input type="text" name="password" id="password" class="form-control" placeholder="รหัสผ่าน" required>
+                <input type="text" name="password" id="password" class="form-control" placeholder="รหัสผ่าน"required>
             </div>
 
             <div class="mb-3">
                 <label for="confirm_password" class="form-label"> ยืนยันรหัสผ่าน </label>
-                <input type="text" name="confirm_password" id="confirm_password" class="form-control" placeholder="ยืนยันรหัสผ่าน" required>
+                <input type="text" name="confirm_password" id="confirm_password" class="form-control" placeholder="ยืนยันรหัสผ่าน"required>
             </div>
 
             <div class="d-grid gap-2 mt-4">
