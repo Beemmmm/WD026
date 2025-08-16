@@ -225,7 +225,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
                 <div class="login-header">
                     <i class="fas fa-user-circle fa-3x mb-3"></i>
                     <h2>เข้าสู่ระบบ</h2>
-                    <p class="mb-0 opacity-75">ยินดีต้อนรับกลับมา</p>
                 </div>
 
                 <!-- Body -->
