@@ -3,17 +3,16 @@ session_start();
 require_once '../config.php'; 
 require_once 'auth_admin.php';
 
-
 // ลบสมาชิก 
 if (isset($_GET['delete'])) { 
     $user_id = $_GET['delete']; 
-// ป้องกันลบตัวเอง 
-if ($user_id != $_SESSION['user_id']) { 
-    $stmt = $conn->prepare("DELETE FROM users WHERE user_id = ? AND role = 'member'"); 
-    $stmt->execute([$user_id]); 
+    // ป้องกันลบตัวเอง 
+    if ($user_id != $_SESSION['user_id']) { 
+        $stmt = $conn->prepare("DELETE FROM users WHERE user_id = ? AND role = 'member'"); 
+        $stmt->execute([$user_id]); 
     } 
-header("Location: users.php"); 
-exit; 
+    header("Location: users.php"); 
+    exit; 
 } 
  
 // ดึงข้อมูลสมาชิก 
@@ -28,42 +27,77 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8"> 
     <title>จัดการสมาชิก</title> 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- DataTable CSS -->
+    <link href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css" rel="stylesheet">
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <style>
+        body {
+            background-color: #293557ff; /* เพิ่มสีพื้นหลังเหมือนฟอร์มสมัครสมาชิก */
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #bad6e2ff;
+            border-radius: 8px; /* เพิ่มมุมโค้งมน */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* เพิ่มเงาให้ดูมีมิติ */
+        }
+        
+        .table {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    </style>
 </head> 
-<body class="container mt-4"> 
+<body>
+    <div class="container main-container">
 
-<h2>จัดการสมาชิก</h2> 
-<a href="index.php" class="btn btn-secondary mb-3">← กลับหน้าผู้ดูแล</a> 
+        <h2 class="text-center mb-4">จัดการสมาชิก</h2>
+        <hr>
+        <a href="index.php" class="btn btn-secondary mb-3">← กลับหน้าผู้ดูแล</a> 
 
-<?php if (count($users) === 0): ?> 
-        <div class="alert alert-warning"> ยังไม่มีสมาชิกในระบบ </div>
-<?php else: ?> 
-    <table class="table table-bordered"> 
-        <thead> 
-            <tr> 
-                <th>ชื่อผู้ใช้</th> 
-                <th>ชื่อ-นามสกุล</th> 
-                <th>อีเมล</th> 
-                <th>วันที่สมัคร</th> 
-                <th>จัดการ</th> 
-            </tr> 
-        </thead> 
-    <tbody> 
-        <?php foreach ($users as $user): ?> 
-            <tr> 
-                <td><?= htmlspecialchars($user['username']) ?></td> 
-                <td><?= htmlspecialchars($user['full_name']) ?></td> 
-                <td><?= htmlspecialchars($user['email']) ?></td> 
-                <td><?= $user['created_at'] ?></td> 
-                <td> 
-<a href="edit_user.php?id=<?= $user['user_id'] ?>" class="btn btn-sm btn-warning"> แก้ไข </a> 
-<a href="users.php?delete=<?= $user['user_id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('คุณต้องการลบสมาชิกหรือไม่?')"> ลบ </a> 
-    </td> 
-</tr> 
+        <?php if (count($users) === 0): ?> 
+            <div class="alert alert-warning">ยังไม่มีสมาชิกในระบบ</div>
+        <?php else: ?> 
+            <table id="productTable" class="table table-striped table-bordered">
+                <thead> 
+                    <tr> 
+                        <th>ชื่อผู้ใช้</th> 
+                        <th>ชื่อ-นามสกุล</th> 
+                        <th>อีเมล</th> 
+                        <th>วันที่สมัคร</th> 
+                        <th>จัดการ</th> 
+                    </tr> 
+                </thead> 
+                <tbody> 
+                    <?php foreach ($users as $user): ?> 
+                        <tr> 
+                            <td><?= htmlspecialchars($user['username']) ?></td> 
+                            <td><?= htmlspecialchars($user['full_name']) ?></td> 
+                            <td><?= htmlspecialchars($user['email']) ?></td> 
+                            <td><?= $user['created_at'] ?></td> 
+                            <td> 
+                                <a href="edit_user.php?id=<?= $user['user_id'] ?>" class="btn btn-sm btn-warning">แก้ไข</a> 
+                                <a href="users.php?delete=<?= $user['user_id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('คุณต้องการลบสมาชิกหรือไม่?')">ลบ</a> 
+                            </td> 
+                        </tr> 
+                    <?php endforeach; ?> 
+                </tbody> 
+            </table> 
+        <?php endif; ?> 
 
-<?php endforeach; ?> 
-    </tbody> 
-        </table> 
-<?php endif; ?> 
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let table = new DataTable('#productTable');
+    </script>
 
 </body> 
 </html>
