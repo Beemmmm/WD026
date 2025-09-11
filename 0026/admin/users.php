@@ -1,5 +1,5 @@
 <?php 
-session_start(); 
+
 require_once '../config.php'; 
 require_once 'auth_admin.php';
 
@@ -14,13 +14,13 @@ if (isset($_GET['delete'])) {
     header("Location: users.php"); 
     exit; 
 } 
- 
+
 // ดึงข้อมูลสมาชิก 
 $stmt = $conn->prepare("SELECT * FROM users WHERE role = 'member' ORDER BY created_at DESC"); 
 $stmt->execute(); 
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC); 
 ?> 
- 
+
 <!DOCTYPE html> 
 <html lang="th"> 
 <head> 
@@ -33,6 +33,8 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css" rel="stylesheet">
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         body {
             background-color: #293557ff; /* เพิ่มสีพื้นหลังเหมือนฟอร์มสมัครสมาชิก */
@@ -83,7 +85,14 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td><?= $user['created_at'] ?></td> 
                             <td> 
                                 <a href="edit_user.php?id=<?= $user['user_id'] ?>" class="btn btn-sm btn-warning">แก้ไข</a> 
-                                <a href="users.php?delete=<?= $user['user_id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('คุณต้องการลบสมาชิกหรือไม่?')">ลบ</a> 
+                                <!-- <a href="users.php?delete=<?= $user['user_id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('คุณต้องการลบสมาชิกหรือไม่?')">ลบ</a>  -->
+
+                        <form action="del_sweet.php" method="POST" style="display:inline;">
+                    <input type="hidden" name="u_id" value="<?php echo $user['user_id']; ?>">
+                    <button type="button" class="delete-button btn btn-danger btn-sm " data-user-id="<?php echo
+                    $user['user_id']; ?>"> ลบ </button>
+                    </form>
+
                             </td> 
                         </tr> 
                     <?php endforeach; ?> 
@@ -98,6 +107,44 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <script>
         let table = new DataTable('#productTable');
     </script>
+
+
+<script>
+// ฟังกช์ นั ส ำหรับแสดงกลอ่ งยนื ยัน SweetAlert2
+function showDeleteConfirmation(userId) {
+Swal.fire({
+title: 'คุณแน่ใจหรือไม่?',
+text: 'คุณจะไม่สามารถเรียกคืนข้อมูลกลับได ้!',
+icon: 'warning',
+showCancelButton: true,
+confirmButtonText: 'ลบ',
+cancelButtonText: 'ยกเลิก',
+}).then((result) => {
+if (result.isConfirmed) {
+// หากผู้ใช้ยืนยันให้ส่งค่าฟอร์มไปยัง delete.php เพื่อลบข้อมูล
+const form = document.createElement('form');
+form.method = 'POST';
+form.action = 'delUser_Sweet.php';
+const input = document.createElement('input');
+input.type = 'hidden';
+input.name = 'u_id';
+input.value = userId;
+form.appendChild(input);
+document.body.appendChild(form);
+form.submit();
+}
+});
+}
+// แนบตัวตรวจจับเหตุกำรณ์คลิกกับองค์ปุ ่่มลบทั ่ ้งหมดที่มีคลำส delete-button
+const deleteButtons = document.querySelectorAll('.delete-button');
+deleteButtons.forEach((button) => {
+button.addEventListener('click', () => {
+const userId = button.getAttribute('data-user-id');
+showDeleteConfirmation(userId);
+});
+});
+</script>
+
 
 </body> 
 </html>
