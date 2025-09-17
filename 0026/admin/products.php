@@ -1,92 +1,131 @@
 <?php
+require_once '../config.php';  
+require_once 'auth_admin.php'; 
 
-require_once '../config.php'; 
-require_once 'auth_admin.php';
-
-// แนวทำง: ถ ้ำ !isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin' -> redirect ไป ../login.php แล้ว exit;
-// เพมิ่ สนิคำ้ใหม่
+// เพิ่มสินค้าใหม่
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
 $name = trim($_POST['product_name']);
 $description = trim($_POST['description']);
-$price = floatval($_POST['price']); // floatval() ใชแปลงเป็น ้ float
-$stock = intval($_POST['stock']);  // intval() ใชแ้ปลงเป็น integer
+$price = floatval($_POST['price']); // floatval() ใช้แปลงเป็น float
+$stock = intval($_POST['stock']); // intval() ใช้แปลงเป็น integer
 $category_id = intval($_POST['category_id']);
-}
-
-// ค่ำที่ได ้จำกฟอร์มเป็น string เสมอ
-if ($name && $price > 0) { // ตรวจสอบชอื่และรำคำสนิคำ้
-$stmt = $pdo->prepare("INSERT INTO products (product_name, description, price, stock, category_id) VALUES (?, ?, ?, ?, ?)");
+// ค่าที่ได้จากฟอร์มเป็น string เสมอ
+if ($name && $price > 0) { // ตรวจสอบชื่อ และราคา
+$stmt = $conn->prepare("INSERT INTO products (product_name, description, price, stock, category_id) VALUES (?, ?, ?, ?, ?)");
 $stmt->execute([$name, $description, $price, $stock, $category_id]);
 header("Location: products.php");
 exit;
 }
+}
 
-// ลบสนิ คำ้
+// ลบสินค้า
 if (isset($_GET['delete'])) {
 $product_id = $_GET['delete'];
-$stmt = $pdo->prepare("DELETE FROM ตำรำง WHERE product_id = ?");
-$stmt->execute([$ตัวแปรค่ำที่ตองกำรbindparam]);
+$stmt = $conn->prepare("DELETE FROM products WHERE product_id = ?");
+$stmt->execute([$product_id]);
 header("Location: products.php");
 exit;
 }
 
-// ดงึรำยกำรสนิคำ้
-$stmt = $pdo->query("SELECT p.*, c.category_name FROM products p LEFT JOIN categories c ON
-p.category_id = c.category_id ORDER BY p.created_at DESC");
+// ดึงรายการสินค้า
+$stmt = $conn->query("SELECT p.*, c.category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id ORDER BY p.created_at DESC");
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // ดึงหมวดหมู่
-$categories = $pdo->query("SELECT * FROM ตำรำง")->fetchAll(PDO::FETCH_ASSOC);
+$categories = $conn->query("SELECT * FROM categories")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>จัดการสินค้า</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+<style>
+body {
+background-color: #293557ff;
+}
+.main-container {
+max-width: 1200px;
+margin: 50px auto;
+padding: 30px;
+background-color: #bad6e2ff;
+border-radius: 8px;
+box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+h2, h5 {
+color: #293557ff;
+}
+.card {
+background-color: #bad6e2ff;
+border: none;
+border-radius: 8px;
+box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.table thead th {
+background-color: #bad6e2ff;
+}
+.table th, .table td {
+vertical-align: middle;
+}
+.table tbody tr:hover {
+background-color: #d8e5ec;
+}
+.form-control, .form-select {
+background-color: #d8e5ec;
+border: 1px solid #bad6e2ff;
+}
+</style>
 </head>
-<body class="container mt-4">
-    
+<body>
+<div class="container main-container">
+<div class="d-flex justify-content-between align-items-center mb-4">
 <h2>จัดการสินค้า</h2>
-<a href="index.php" class="btn btn-secondary mb-3">← กลับหน้าผู้ดูแล </a>
+<a href="index.php" class="btn btn-secondary">
+<i class="bi bi-arrow-left"></i> กลับหน้าผู้ดูแล
+</a>
+</div>
 
-<!-- ฟอรม์ เพมิ่ สนิคำ้ใหม่ -->
-<form method="post" class="row g-3 mb-4">
-<h5> เพิ่มสินค้าไหม </h ่ 5>
-<div class="col-md-4">
-<input type="text" name="product_name" class="form-control" placeholder="ชอื่ สนิคำ้"
-required>
+<!-- ฟอร์มเพิ่มสินค้าใหม่ -->
+<div class="card p-4 mb-4">
+<h5>เพิ่มสินค้าใหม่</h5>
+<form method="post" class="row g-3">
+<div class="col-md-6">
+<label for="product_name" class="form-label">ชื่อสินค้า</label>
+<input type="text" name="product_name" id="product_name" class="form-control" placeholder="ชื่อสินค้า" required>
 </div>
-<div class="col-md-2">
-<input type="number" step="0.01" name="price" class="form-control" placeholder="รำคำ"
-required>
+<div class="col-md-3">
+<label for="price" class="form-label">ราคา</label>
+<input type="number" step="0.01" name="price" id="price" class="form-control" placeholder="ราคา" required>
 </div>
-<div class="col-md-2">
-<input type="number" name="stock" class="form-control" placeholder="จ ำนวน" required>
+<div class="col-md-3">
+<label for="stock" class="form-label">จำนวนคงเหลือ</label>
+<input type="number" name="stock" id="stock" class="form-control" placeholder="จำนวน" required>
 </div>
-<div class="col-md-2">
-<select name="category_id" class="form-select" required>
+<div class="col-md-6">
+<label for="category_id" class="form-label">หมวดหมู่</label>
+<select name="category_id" id="category_id" class="form-select" required>
 <option value="">เลือกหมวดหมู่</option>
-<?php foreach ($ตัวแปรที่เก็บหมวดหมู่ as $cat): ?>
-<option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['ชอื่ หมวดหม'ู่])
-?></option>
+<?php foreach ($categories as $cat): ?>
+<option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['category_name']) ?></option>
 <?php endforeach; ?>
 </select>
 </div>
 <div class="col-12">
-<textarea name="description" class="form-control" placeholder="รำยละเอยีดสนิคำ้"
-rows="2"></textarea>
+<label for="description" class="form-label">รายละเอียดสินค้า</label>
+<textarea name="description" id="description" class="form-control" placeholder="รายละเอียดสินค้า" rows="3"></textarea>
 </div>
-<div class="col-12">
-<button type="submit" name="add_product" class="btn btn-primary">เพมิ่ สนิคำ้</button>
+<div class="col-12 mt-3">
+<button type="submit" name="add_product" class="btn btn-primary">เพิ่มสินค้า</button>
 </div>
 </form>
+</div>
 
-<!-- แสดงรำยกำรสนิคำ้ , แก ้ไข , ลบ -->
-<h5>รายการสินค้า </h5>
-<table class="table table-bordered">
+<!-- แสดงรายการสินค้า, แก้ไข, ลบ -->
+<h5 class="mb-3">รายการสินค้า</h5>
+<div class="table-responsive">
+<table class="table table-bordered table-hover">
 <thead>
 <tr>
 <th>ชื่อสินค้า</th>
@@ -97,20 +136,22 @@ rows="2"></textarea>
 </tr>
 </thead>
 <tbody>
-<?php foreach ($ตัวแปรเก็บสนิคำ้ as $p): ?>
+<?php foreach ($products as $p): ?>
 <tr>
-<td><?= htmlspecialchars($p['ค่ำที่ต ้องกำรแสดง']) ?></td>
-<td><?= htmlspecialchars($p['ค่ำที่ต ้องกำรแสดง']) ?></td>
-<td><?= number_format($p['ค่ำที่ต ้องกำรแสดง'], 2) ?> บาท </td>
-<td><?= $p['ค่ำที่ต ้องกำรแสดง'] ?></td>
+<td><?= htmlspecialchars($p['product_name']) ?></td>
+<td><?= htmlspecialchars($p['category_name']) ?></td>
+<td><?= number_format($p['price'], 2) ?> บาท</td>
+<td><?= $p['stock'] ?></td>
 <td>
-<a href="products.php?delete=<?= $p['product_id'] ?>" class="btn btn-sm btn-danger"
-onclick="return confirm('ยนื ยันกำรลบสนิคำ้นี้?')"> ลบ </a>
-<a href="edit_product.php?id=<?= $p['product_id'] ?>" class="btn btn-sm btnwarning"> แก้ไข </a>
+<a href="edit_product.php?id=<?= $p['product_id'] ?>" class="btn btn-sm btn-warning me-2"><i class="bi bi-pencil-square"></i> แก้ไข</a>
+<a href="products.php?delete=<?= $p['product_id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('ยืนยันการลบสินค้านี้')"><i class="bi bi-trash"></i> ลบ</a>
 </td>
 </tr>
 <?php endforeach; ?>
 </tbody>
 </table>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

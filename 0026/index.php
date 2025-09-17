@@ -1,14 +1,14 @@
 <?php
-session_start();
-require_once 'config.php';
+    session_start();
+    require_once 'config.php';
+    $isLoggedIn = isset($_SESSION['user_id']);
 
-$isLoggedIn = isset($_SESSION['user_id']);
-$stmt = $conn->query("SELECT p.*, c.category_name  
-    FROM products p  
-    LEFT JOIN categories c ON p.category_id = c.category_id  
-    ORDER BY p.created_at DESC"); 
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC); 
-
+    $stmt = $conn->query("SELECT p.*, c.category_name
+    FROM products p
+    LEFT JOIN categories c ON p.category_id = c.category_id
+    ORDER BY p.created_at DESC");
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
 ?>
 
 <!DOCTYPE html>
