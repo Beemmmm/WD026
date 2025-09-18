@@ -19,6 +19,11 @@ $stmt = $conn->prepare("SELECT p.*, c.category_name
 $stmt->execute([$product_id]);
 $product = $stmt->fetch(PDO::FETCH_ASSOC); 
 
+
+$img = !empty($product['image'])
+? 'product_images/' . rawurlencode($product['image'])
+: 'product_images/no-image.jpeg';
+
 ?>
 
 <!DOCTYPE html> 
@@ -55,6 +60,9 @@ $product = $stmt->fetch(PDO::FETCH_ASSOC);
         <a href="index.php" class="btn btn-secondary mb-3">← กลับหน้ารายการสินค้า</a>
 
         <div class="card"> 
+
+        <img src="<?= $img ?>">
+
             <div class="card-body"> 
                 <h3 class="card-title"><?= htmlspecialchars($product['product_name'])?></h3> 
                 <h6 class="text-muted">หมวดหมู่: <?= htmlspecialchars($product['category_name'])?></h6> 
