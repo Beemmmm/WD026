@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 11, 2025 at 07:25 AM
+-- Generation Time: Sep 23, 2025 at 04:47 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,7 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `online_shop`
 --
-
+CREATE DATABASE IF NOT EXISTS online_shop DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE online_shop;
 -- --------------------------------------------------------
 
 --
@@ -34,6 +35,14 @@ CREATE TABLE `cart` (
   `quantity` int(11) NOT NULL,
   `added_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cart`
+--
+
+INSERT INTO `cart` (`cart_id`, `user_id`, `product_id`, `quantity`, `added_at`) VALUES
+(1, 2, 2, 1, '2025-09-10 08:19:15'),
+(2, 3, 1, 2, '2025-09-10 08:19:15');
 
 -- --------------------------------------------------------
 
@@ -51,10 +60,9 @@ CREATE TABLE `categories` (
 --
 
 INSERT INTO `categories` (`category_id`, `category_name`) VALUES
-(1, 'ขนม'),
+(1, 'อิเล็กทรอนิกส์'),
 (2, 'เครื่องเขียน'),
-(3, 'เสื้อผ้า'),
-(4, 'เกม');
+(3, 'เสื้อผ้า');
 
 -- --------------------------------------------------------
 
@@ -75,7 +83,7 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `order_date`, `status`) VALUES
-(1, NULL, 834.00, '2025-09-11 01:44:05', 'processing');
+(1, 2, 834.00, '2025-09-10 08:19:15', 'processing');
 
 -- --------------------------------------------------------
 
@@ -112,6 +120,7 @@ CREATE TABLE `products` (
   `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
   `stock` int(11) DEFAULT 0,
+  `image` varchar(255) NOT NULL,
   `category_id` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -120,10 +129,11 @@ CREATE TABLE `products` (
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `stock`, `category_id`, `created_at`) VALUES
-(1, 'หูฟังไร้สาย', 'หูฟัง Bluetooth คุณภาพเสียงดี', 599.00, 50, 1, '2025-09-11 01:44:05'),
-(2, 'สมุดโน้ต', 'สมุดโน้ตขนาด A5', 35.00, 100, 2, '2025-09-11 01:44:05'),
-(3, 'เสื้อยืดคอกลม', 'เสื้อยืดสีขาวคอกลม', 199.00, 80, 3, '2025-09-11 01:44:05');
+INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `stock`, `image`, `category_id`, `created_at`) VALUES
+(1, 'หูฟังไร้สาย', 'หูฟัง Bluetooth คุณภาพเสียงดี', 599.00, 50, 'product_1758636582.png', 1, '2025-09-10 08:19:15'),
+(2, 'สมุดโน้ต', 'สมุดโน้ตขนาด A5', 35.00, 100, 'product_1758636597.jpg', 1, '2025-09-10 08:19:15'),
+(3, 'เสื้อยืดคอกลม', 'เสื้อยืดสีขาวคอกลม', 199.00, 80, 'product_1758636608.jpg', 1, '2025-09-10 08:19:15'),
+(4, 'แป้นพิมพ์', 'Keychron', 3290.00, 9, 'product_1758636546.jpg', 1, '2025-09-23 13:45:28');
 
 -- --------------------------------------------------------
 
@@ -169,10 +179,11 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `full_name`, `role`, `created_at`) VALUES
-(1, 'admin1', 'admin_pass', 'admin1@example.com', 'Admin One', 'admin', '2025-09-11 01:44:05'),
-(4, 'admin2', '$2y$10$AuycIAjliqphxFfbtGDLvOxezjKoZ2D9yjciP772RVEt1TNV1PCVW', 'admin@email.com', 'admin2', 'admin', '2025-09-11 01:54:28'),
-(5, 'member1', '$2y$10$PUjKNY7mVlGQa3Qh2jlEZuhoeDzly.p2gzixO2exLZ3o1TOLczPFa', 'member1@email.com', 'member1', 'member', '2025-09-11 03:22:36'),
-(6, 'member2', '$2y$10$LqxLG8oODQd1Jw7M6lhZ3O7s0vjKY.iW93h6/vEkHqQmMuzT5cARG', 'member2@email.com', 'member2', 'member', '2025-09-11 04:02:31');
+(1, 'admin1', 'admin_pass', 'admin1@example.com', 'Admin One', 'admin', '2025-09-10 08:19:15'),
+(2, 'member1', 'member_pass', 'member1@example.com', 'John Doe', 'member', '2025-09-10 08:19:15'),
+(3, 'member2', 'member_pass', 'member2@example.com', 'Jane Smith', 'member', '2025-09-10 08:19:15'),
+(4, 'admin2', '$2y$10$SWU.aqt5LFjwuxxIQg8f.ur1UQhxbgBo036l800Xng5gEl9EyGTRm', 'admin2@admin2.com', 'admin2', 'admin', '2025-09-10 08:49:05'),
+(5, 'admin4', '$2y$10$LZg6eD/hvgyoeZfxPaUT1u94zH4qaRzQNX2l4hin96fuQPFJE55Um', 'admin4@email.com', 'admin4', 'admin', '2025-09-17 14:51:48');
 
 --
 -- Indexes for dumped tables
@@ -243,7 +254,7 @@ ALTER TABLE `cart`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `orders`
@@ -261,7 +272,7 @@ ALTER TABLE `order_items`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `shipping`
@@ -273,7 +284,7 @@ ALTER TABLE `shipping`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
