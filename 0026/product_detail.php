@@ -47,7 +47,7 @@ $img = !empty($product['image'])
         }
         
         .card {
-            background-color: #bad6e2ff;
+            background-color: #dde6ebff;
             border: none;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -77,7 +77,7 @@ $img = !empty($product['image'])
                             <label for="quantity" class="form-label">จำนวน:</label> 
                             <input type="number" name="quantity" id="quantity" class="form-control" style="width: 100px; display: inline-block;" value="1" min="1" max="<?= $product['stock'] ?>" required> 
                         </div>
-                        <button type="submit" class="btn btn-success">เพิ่มในตะกร้า</button>
+                        <button type="submit" class="btn btn-info">เพิ่มในตะกร้า</button>
                     </form> 
                 <?php else: ?> 
                     <div class="alert alert-info mt-3">กรุณาเข้าสู่ระบบเพื่อสั่งสินค้า</div>
