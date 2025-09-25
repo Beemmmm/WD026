@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 23, 2025 at 04:47 PM
+-- Generation Time: Sep 25, 2025 at 07:14 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -42,7 +42,8 @@ CREATE TABLE `cart` (
 
 INSERT INTO `cart` (`cart_id`, `user_id`, `product_id`, `quantity`, `added_at`) VALUES
 (1, 2, 2, 1, '2025-09-10 08:19:15'),
-(2, 3, 1, 2, '2025-09-10 08:19:15');
+(2, 3, 1, 2, '2025-09-10 08:19:15'),
+(15, 6, 4, 2, '2025-09-25 04:37:44');
 
 -- --------------------------------------------------------
 
@@ -83,7 +84,12 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`order_id`, `user_id`, `total_amount`, `order_date`, `status`) VALUES
-(1, 2, 834.00, '2025-09-10 08:19:15', 'processing');
+(1, 2, 834.00, '2025-09-10 08:19:15', 'processing'),
+(4, 6, 80139.00, '2025-09-25 04:01:24', 'pending'),
+(5, 6, 6280.00, '2025-09-25 04:13:16', 'pending'),
+(6, 6, 15250.00, '2025-09-25 04:16:54', 'pending'),
+(7, 6, 3290.00, '2025-09-25 04:36:28', 'pending'),
+(8, 6, 13160.00, '2025-09-25 04:37:04', 'pending');
 
 -- --------------------------------------------------------
 
@@ -106,7 +112,16 @@ CREATE TABLE `order_items` (
 INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_id`, `quantity`, `price`) VALUES
 (1, 1, 1, 1, 599.00),
 (2, 1, 2, 2, 35.00),
-(3, 1, 3, 1, 199.00);
+(3, 1, 3, 1, 199.00),
+(7, 4, 1, 1, 599.00),
+(8, 4, 3, 20, 2990.00),
+(9, 4, 4, 6, 3290.00),
+(10, 5, 4, 1, 3290.00),
+(11, 5, 3, 1, 2990.00),
+(12, 6, 4, 1, 3290.00),
+(13, 6, 3, 4, 2990.00),
+(14, 7, 4, 1, 3290.00),
+(15, 8, 4, 4, 3290.00);
 
 -- --------------------------------------------------------
 
@@ -132,7 +147,7 @@ CREATE TABLE `products` (
 INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `stock`, `image`, `category_id`, `created_at`) VALUES
 (1, 'หูฟังไร้สาย', 'หูฟัง Bluetooth คุณภาพเสียงดี', 599.00, 50, 'product_1758636582.png', 1, '2025-09-10 08:19:15'),
 (2, 'สมุดโน้ต', 'สมุดโน้ตขนาด A5', 35.00, 100, 'product_1758636597.jpg', 1, '2025-09-10 08:19:15'),
-(3, 'เสื้อยืดคอกลม', 'เสื้อยืดสีขาวคอกลม', 199.00, 80, 'product_1758636608.jpg', 1, '2025-09-10 08:19:15'),
+(3, 'เสื้อยืดคอกลม', 'เสื้อยืดสีขาวคอกลม', 2990.00, 80, 'product_1758636608.jpg', 1, '2025-09-10 08:19:15'),
 (4, 'แป้นพิมพ์', 'Keychron', 3290.00, 9, 'product_1758636546.jpg', 1, '2025-09-23 13:45:28');
 
 -- --------------------------------------------------------
@@ -156,7 +171,12 @@ CREATE TABLE `shipping` (
 --
 
 INSERT INTO `shipping` (`shipping_id`, `order_id`, `address`, `city`, `postal_code`, `phone`, `shipping_status`) VALUES
-(1, 1, '123 ถนนหลัก เขตเมือง', 'กรุงเทพมหานคร', '10100', '0812345678', 'shipped');
+(1, 1, '123 ถนนหลัก เขตเมือง', 'กรุงเทพมหานคร', '10100', '0812345678', 'shipped'),
+(2, 4, '0455/ijo', 'jyf', '44456', '0245423', 'not_shipped'),
+(3, 5, '153', 'nakhon', '73000', '12345678', 'not_shipped'),
+(4, 6, '123', 'nakhon', '73000', '0245423', 'not_shipped'),
+(5, 7, '0455/ijo', 'nakhon', '44456', '0245423', 'not_shipped'),
+(6, 8, '153', 'nakhon', '44456', '0245423', 'not_shipped');
 
 -- --------------------------------------------------------
 
@@ -183,7 +203,8 @@ INSERT INTO `users` (`user_id`, `username`, `password`, `email`, `full_name`, `r
 (2, 'member1', 'member_pass', 'member1@example.com', 'John Doe', 'member', '2025-09-10 08:19:15'),
 (3, 'member2', 'member_pass', 'member2@example.com', 'Jane Smith', 'member', '2025-09-10 08:19:15'),
 (4, 'admin2', '$2y$10$SWU.aqt5LFjwuxxIQg8f.ur1UQhxbgBo036l800Xng5gEl9EyGTRm', 'admin2@admin2.com', 'admin2', 'admin', '2025-09-10 08:49:05'),
-(5, 'admin4', '$2y$10$LZg6eD/hvgyoeZfxPaUT1u94zH4qaRzQNX2l4hin96fuQPFJE55Um', 'admin4@email.com', 'admin4', 'admin', '2025-09-17 14:51:48');
+(5, 'admin4', '$2y$10$LZg6eD/hvgyoeZfxPaUT1u94zH4qaRzQNX2l4hin96fuQPFJE55Um', 'admin4@email.com', 'admin4', 'admin', '2025-09-17 14:51:48'),
+(6, 'member3', '$2y$10$JGLFuYjEGplEg2MU3q4yu.QftmKpVB6xP4QSTXt7bqhcwiZPPcsMe', 'member3@gmail.com', 'member3', 'member', '2025-09-25 01:58:03');
 
 --
 -- Indexes for dumped tables
@@ -248,7 +269,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -260,13 +281,13 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -278,13 +299,13 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `shipping`
 --
 ALTER TABLE `shipping`
-  MODIFY `shipping_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `shipping_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
